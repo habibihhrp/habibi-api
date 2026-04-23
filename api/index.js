@@ -19,7 +19,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ===== SIMPLE JSON DATABASE =====
-const DATA_DIR = path.join(__dirname, 'data');
+// On Vercel /tmp is the only writable dir; locally use ../data
+const DATA_DIR = process.env.VERCEL ? '/tmp' : path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'users.json');
 
 function loadDB() {
@@ -65,8 +66,8 @@ function requireApiKey(req, res, next) {
 const ok = (data) => ({ status: true, creator: 'Habibi Official', result: data });
 const err = (msg) => ({ status: false, error: msg });
 
-// ===== ROOT (serve frontend) =====
-app.use(express.static(path.join(__dirname, 'public')));
+// ===== ROOT (serve frontend) — only locally; on Vercel public/ is auto-served =====
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // ===== AUTH ROUTES =====
 app.post('/auth/register', (req, res) => {
@@ -244,8 +245,11 @@ app.get('/api/utility/shortlink', requireApiKey, async (req, res) => {
 // 404
 app.use((req, res) => res.status(404).json(err('Endpoint tidak ditemukan')));
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Habibi API running on port ${PORT}`);
-});
+// Only listen when running locally — Vercel serverless handles requests directly
+if (!process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Habibi API running on port ${PORT}`);
+  });
+}
 
 export default app;
