@@ -12,8 +12,8 @@ export async function GET(req: NextRequest) {
   if (!ip) return jsonErr("Param `ip` wajib. Contoh: ?ip=8.8.8.8");
 
   try {
-    const r = await fetch(`https://freeipapi.com/api/json/${encodeURIComponent(ip)}`, { cache: "no-store" });
-    if (!r.ok) return jsonErr("Sumber IP lookup gagal dijangkau", 502);
+    const r = await fetch(`https://freeipapi.com/api/json/${encodeURIComponent(ip)}`, { cache: "no-store", headers: { "user-agent": "Mozilla/5.0 habibi-api" } });
+    if (!r.ok) return jsonErr(`Sumber IP lookup gagal (${r.status}): ${(await r.text()).slice(0, 120)}`, 502);
     const j = await r.json();
     if (!j.ipAddress) return jsonErr("IP tidak valid", 400);
     return jsonOk({
