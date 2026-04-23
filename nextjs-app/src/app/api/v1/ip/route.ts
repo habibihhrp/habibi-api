@@ -12,16 +12,20 @@ export async function GET(req: NextRequest) {
   if (!ip) return jsonErr("Param `ip` wajib. Contoh: ?ip=8.8.8.8");
 
   try {
-    const r = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`, { cache: "no-store" });
+    const r = await fetch(`https://freeipapi.com/api/json/${encodeURIComponent(ip)}`, { cache: "no-store" });
     if (!r.ok) return jsonErr("Sumber IP lookup gagal dijangkau", 502);
     const j = await r.json();
-    if (!j.success) return jsonErr(j.message || "IP tidak valid", 400);
+    if (!j.ipAddress) return jsonErr("IP tidak valid", 400);
     return jsonOk({
-      ip: j.ip, city: j.city, region: j.region,
-      country: j.country, country_code: j.country_code, postal: j.postal,
-      latitude: j.latitude, longitude: j.longitude,
-      timezone: j.timezone?.id,
-      isp: j.connection?.isp, org: j.connection?.org, asn: j.connection?.asn,
+      ip: j.ipAddress,
+      city: j.cityName,
+      region: j.regionName,
+      country: j.countryName,
+      country_code: j.countryCode,
+      zip: j.zipCode,
+      latitude: j.latitude,
+      longitude: j.longitude,
+      timezone: j.timeZone,
     }, auth.ctx);
   } catch (e: any) {
     return jsonErr(e?.message || "Gagal fetch", 502);
