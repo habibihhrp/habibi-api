@@ -1,0 +1,21 @@
+{
+  "name": "habibi-api",
+  "version": "1.0.0",
+  "description": "Habibi Official REST API Service",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "qrcode": "^1.5.4",
+    "yt-search": "^2.10.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

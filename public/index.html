@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Habibi API — REST API Service</title>
+<meta name="description" content="Habibi Official REST API — TikTok downloader, YouTube search, QR Code, Translate, Cuaca, Jadwal Sholat & lainnya." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🚀%3C/text%3E%3C/svg%3E"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { font-family: 'Inter', sans-serif; }
+  code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
+  body {
+    background: #050510;
+    color: #e4e4f0;
+    overflow-x: hidden;
+  }
+  .glow-bg {
+    position: fixed; inset: 0; z-index: -1;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(139,92,246,0.15), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(34,211,238,0.12), transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(236,72,153,0.08), transparent 60%);
+  }
+  .grid-bg {
+    position: fixed; inset: 0; z-index: -1;
+    background-image:
+      linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+  .glass {
+    background: rgba(20, 20, 35, 0.5);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(139,92,246,0.15);
+  }
+  .glass:hover { border-color: rgba(139,92,246,0.4); }
+  .gradient-text {
+    background: linear-gradient(135deg, #a78bfa, #22d3ee, #ec4899);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    transition: all .2s;
+    box-shadow: 0 4px 20px rgba(139,92,246,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(139,92,246,0.5); }
+  .badge-get { background: rgba(34,211,238,0.15); color: #22d3ee; border: 1px solid rgba(34,211,238,0.3); }
+  .badge-post { background: rgba(236,72,153,0.15); color: #ec4899; border: 1px solid rgba(236,72,153,0.3); }
+  .scroll-fade::-webkit-scrollbar { width: 6px; }
+  .scroll-fade::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 3px; }
+  .pulse-dot {
+    width: 8px; height: 8px; background: #10b981; border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(16,185,129,0.7);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
+    100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+  }
+  .fadeIn { animation: fadeIn .5s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .endpoint-card { transition: all .25s; }
+  .endpoint-card:hover { transform: translateY(-3px); }
+</style>
+</head>
+<body>
+
+<div class="glow-bg"></div>
+<div class="grid-bg"></div>
+
+<!-- NAVBAR -->
+<nav class="sticky top-0 z-40 backdrop-blur-xl bg-black/30 border-b border-purple-500/10">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center font-black text-lg">H</div>
+      <div>
+        <div class="font-bold text-white">Habibi API</div>
+        <div class="text-xs text-purple-300">by Habibi Official</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+        <div class="pulse-dot"></div>
+        <span class="text-xs text-emerald-300 font-medium">Online</span>
+      </div>
+      <button onclick="openModal('register')" class="btn-primary px-5 py-2 rounded-lg text-sm font-semibold text-white">Get API Key</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
+  <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-6 fadeIn">
+    <span class="text-xs">🚀</span>
+    <span class="text-xs text-purple-200">Production-Ready REST API</span>
+  </div>
+  <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight fadeIn">
+    Powerful API for <br/>
+    <span class="gradient-text">Modern Developers</span>
+  </h1>
+  <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10 fadeIn">
+    Akses 9+ endpoint siap pakai: TikTok downloader, YouTube search, QR generator, translate, cuaca, jadwal sholat dan banyak lagi. Gratis untuk semua orang.
+  </p>
+  <div class="flex flex-wrap items-center justify-center gap-3 fadeIn">
+    <button onclick="openModal('register')" class="btn-primary px-8 py-3 rounded-xl font-semibold text-white">Daftar Gratis →</button>
+    <button onclick="document.getElementById('endpoints').scrollIntoView({behavior:'smooth'})" class="px-8 py-3 rounded-xl font-semibold border border-purple-500/30 hover:bg-purple-500/10">Lihat Dokumentasi</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-3xl mx-auto">
+    <div class="glass rounded-2xl p-5">
+      <div class="text-3xl font-black gradient-text" id="stat-endpoints">9+</div>
+      <div class="text-xs text-gray-400 mt-1">Endpoints</div>
+    </div>
+    <div class="glass rounded-2xl p-5">
+      <div class="text-3xl font-black gradient-text">99.9%</div>
+      <div class="text-xs text-gray-400 mt-1">Uptime</div>
+    </div>
+    <div class="glass rounded-2xl p-5">
+      <div class="text-3xl font-black gradient-text">100/d</div>
+      <div class="text-xs text-gray-400 mt-1">Free Limit</div>
+    </div>
+    <div class="glass rounded-2xl p-5">
+      <div class="text-3xl font-black gradient-text">∞</div>
+      <div class="text-xs text-gray-400 mt-1">Premium</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="max-w-5xl mx-auto px-6 py-12">
+  <h2 class="text-3xl font-bold text-center mb-2">Pilih Tier Kamu</h2>
+  <p class="text-center text-gray-400 mb-10">Mulai gratis. Upgrade kapan aja kamu butuh lebih.</p>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="glass rounded-2xl p-8">
+      <div class="text-sm text-purple-300 mb-2">FREE</div>
+      <div class="flex items-baseline gap-1 mb-6">
+        <span class="text-5xl font-black">Rp 0</span>
+        <span class="text-gray-400">/selamanya</span>
+      </div>
+      <ul class="space-y-3 text-sm text-gray-300 mb-8">
+        <li>✓ 100 request per hari</li>
+        <li>✓ Akses semua endpoint</li>
+        <li>✓ Reset otomatis tiap 24 jam</li>
+        <li>✓ Email support</li>
+      </ul>
+      <button onclick="openModal('register')" class="w-full py-3 rounded-xl border border-purple-500/30 hover:bg-purple-500/10 font-semibold">Daftar Gratis</button>
+    </div>
+    <div class="glass rounded-2xl p-8 relative border-purple-500/40" style="background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(34,211,238,0.05));">
+      <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-purple-500 to-cyan-400 text-white">RECOMMENDED</div>
+      <div class="text-sm text-cyan-300 mb-2">PREMIUM</div>
+      <div class="flex items-baseline gap-1 mb-6">
+        <span class="text-5xl font-black gradient-text">Rp 25K</span>
+        <span class="text-gray-400">/bulan</span>
+      </div>
+      <ul class="space-y-3 text-sm text-gray-300 mb-8">
+        <li>✓ <b class="text-white">Unlimited</b> request</li>
+        <li>✓ Akses semua endpoint</li>
+        <li>✓ Priority response</li>
+        <li>✓ Direct support via WhatsApp</li>
+        <li>✓ Request endpoint custom</li>
+      </ul>
+      <a href="https://whatsapp.com/channel/0029Vb6SDXJDDmFXx0cHwF3f" target="_blank" class="block text-center btn-primary py-3 rounded-xl font-semibold text-white">Upgrade via WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- ENDPOINTS -->
+<section id="endpoints" class="max-w-7xl mx-auto px-6 py-16">
+  <div class="flex items-end justify-between mb-8 flex-wrap gap-4">
+    <div>
+      <h2 class="text-3xl font-bold mb-1">API Endpoints</h2>
+      <p class="text-gray-400">Klik endpoint untuk lihat detail & try it.</p>
+    </div>
+    <div class="flex gap-2 flex-wrap" id="filter-tabs"></div>
+  </div>
+  <div id="endpoint-list" class="grid md:grid-cols-2 gap-4"></div>
+</section>
+
+<!-- FOOTER -->
+<footer class="max-w-7xl mx-auto px-6 py-12 border-t border-purple-500/10 mt-12">
+  <div class="grid md:grid-cols-3 gap-8">
+    <div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center font-black">H</div>
+        <div>
+          <div class="font-bold text-white">Habibi API</div>
+          <div class="text-xs text-purple-300">by Habibi Official</div>
+        </div>
+      </div>
+      <p class="text-sm text-gray-400">REST API Service modern untuk developer Indonesia.</p>
+    </div>
+    <div>
+      <div class="font-semibold mb-3 text-white">Sosial Media</div>
+      <ul class="space-y-2 text-sm text-gray-400">
+        <li><a href="https://whatsapp.com/channel/0029Vb6SDXJDDmFXx0cHwF3f" target="_blank" class="hover:text-purple-300">📢 WhatsApp Channel</a></li>
+        <li><a href="https://youtube.com/@habibi_hosting" target="_blank" class="hover:text-purple-300">🎬 YouTube</a></li>
+        <li><a href="https://habibi-store-market.vercel.app" target="_blank" class="hover:text-purple-300">🛒 Store</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="font-semibold mb-3 text-white">Resource</div>
+      <ul class="space-y-2 text-sm text-gray-400">
+        <li><a href="#endpoints" class="hover:text-purple-300">Documentation</a></li>
+        <li><a href="javascript:openModal('register')" class="hover:text-purple-300">Get API Key</a></li>
+        <li><a href="https://whatsapp.com/channel/0029Vb6SDXJDDmFXx0cHwF3f" target="_blank" class="hover:text-purple-300">Support</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="text-center text-xs text-gray-500 mt-10 pt-6 border-t border-purple-500/10">
+    © 2026 Habibi Official. All rights reserved.
+  </div>
+</footer>
+
+<!-- REGISTER MODAL -->
+<div id="modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md p-4 items-center justify-center">
+  <div class="glass rounded-2xl p-8 max-w-md w-full fadeIn">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-2xl font-bold gradient-text" id="modal-title">Daftar API Key</h3>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TRY MODAL -->
+<div id="try-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md p-4 items-center justify-center">
+  <div class="glass rounded-2xl p-8 max-w-2xl w-full fadeIn max-h-[90vh] overflow-y-auto scroll-fade">
+    <div class="flex justify-between items-start mb-6">
+      <div>
+        <span id="try-method" class="px-2 py-1 rounded text-xs font-mono badge-get mr-2">GET</span>
+        <h3 class="text-xl font-bold inline" id="try-title"></h3>
+        <p class="text-xs text-gray-400 mt-2 mono" id="try-path"></p>
+      </div>
+      <button onclick="closeTryModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+    </div>
+    <p class="text-sm text-gray-300 mb-4" id="try-desc"></p>
+    <div id="try-params" class="space-y-3 mb-4"></div>
+    <button id="try-btn" class="btn-primary w-full py-3 rounded-xl font-semibold text-white mb-4">▶ Send Request</button>
+    <div class="text-xs text-gray-400 mb-2 mono">Response:</div>
+    <pre id="try-result" class="bg-black/50 rounded-xl p-4 text-xs mono overflow-auto max-h-80 scroll-fade text-cyan-200">— Belum ada request —</pre>
+  </div>
+</div>
+
+<script>
+const ENDPOINTS = [
+  { cat: 'Auth', method: 'POST', path: '/auth/register', title: 'Register', desc: 'Daftar akun baru & dapat API key gratis.', params: [
+    { name: 'username', label: 'Username', required: true },
+    { name: 'email', label: 'Email', required: true, type: 'email' }
+  ], noKey: true, body: true },
+  { cat: 'Auth', method: 'GET', path: '/auth/profile', title: 'Get Profile', desc: 'Cek info akun & sisa limit hari ini.', params: [
+    { name: 'apikey', label: 'API Key', required: true }
+  ] },
+  { cat: 'Search', method: 'GET', path: '/api/search/youtube', title: 'YouTube Search', desc: 'Cari video YouTube berdasarkan kata kunci.', params: [
+    { name: 'apikey', label: 'API Key', required: true },
+    { name: 'q', label: 'Keyword', required: true, placeholder: 'judul lagu / video' }
+  ] },
+  { cat: 'Image', method: 'GET', path: '/api/image/qrcode', title: 'QR Code Generator', desc: 'Generate QR code dari teks/URL apa saja. Response: PNG image.', params: [
+    { name: 'apikey', label: 'API Key', required: true },
+    { name: 'text', label: 'Text/URL', required: true, placeholder: 'https://example.com' }
+  ], image: true },
+  { cat: 'AI', method: 'GET', path: '/api/ai/translate', title: 'Translate', desc: 'Terjemahkan teks ke bahasa lain. Default ke Indonesia.', params: [
+    { name: 'apikey', label: 'API Key', required: true },
+    { name: 'text', label: 'Text', required: true, placeholder: 'Hello world' },
+    { name: 'to', label: 'Bahasa Tujuan', placeholder: 'id, en, ja, ko, zh-CN' }
+  ] },
+  { cat: 'Data', method: 'GET', path: '/api/data/cuaca', title: 'Cuaca', desc: 'Info cuaca terkini berdasarkan nama kota.', params: [
+    { name: 'apikey', label: 'API Key', required: true },
+    { name: 'kota', label: 'Kota', required: true, placeholder: 'Jakarta' }
+  ] },
+  { cat: 'Data', method: 'GET', path: '/api/data/jadwalsholat', title: 'Jadwal Sholat', desc: 'Jadwal sholat hari ini untuk kota di Indonesia.', params: [
+    { name: 'apikey', label: 'API Key', required: true },
+    { name: 'kota', label: 'Kota', required: true, placeholder: 'Bandung' }
+  ] },
+  { cat: 'Data', method: 'GET', path: '/api/data/quote', title: 'Random Quote', desc: 'Quote inspirasi random.', params: [
+    { name: 'apikey', label: 'API Key', required: true }
+  ] },
+  { cat: 'Random', method: 'GET', path: '/api/random/fact', title: 'Random Fact', desc: 'Fakta random dari berbagai topik.', params: [
+    { name: 'apikey', label: 'API Key', required: true }
+  ] },
+  { cat: 'Downloader', method: 'GET', path: '/api/downloader/tiktok', title: 'TikTok Downloader', desc: 'Download video TikTok tanpa watermark.', params: [
+    { name: 'apikey', label: 'API Key', required: true },
+    { name: 'url', label: 'TikTok URL', required: true, placeholder: 'https://www.tiktok.com/@user/video/...' }
+  ] },
+  { cat: 'Utility', method: 'GET', path: '/api/utility/shortlink', title: 'URL Shortener', desc: 'Pendekkan URL panjang via is.gd.', params: [
+    { name: 'apikey', label: 'API Key', required: true },
+    { name: 'url', label: 'URL', required: true, placeholder: 'https://verylongurl.example.com/...' }
+  ] },
+];
+
+const cats = ['All', ...new Set(ENDPOINTS.map(e => e.cat))];
+let activeCat = 'All';
+
+function renderTabs() {
+  document.getElementById('filter-tabs').innerHTML = cats.map(c =>
+    `<button onclick="setCat('${c}')" class="px-4 py-2 rounded-lg text-sm font-medium ${c === activeCat ? 'bg-purple-500/20 text-purple-200 border border-purple-500/40' : 'text-gray-400 hover:text-white'}">${c}</button>`
+  ).join('');
+}
+function setCat(c) { activeCat = c; renderTabs(); renderList(); }
+
+function renderList() {
+  const list = activeCat === 'All' ? ENDPOINTS : ENDPOINTS.filter(e => e.cat === activeCat);
+  document.getElementById('endpoint-list').innerHTML = list.map((e, i) => `
+    <div class="endpoint-card glass rounded-xl p-5 cursor-pointer" onclick='openTry(${JSON.stringify(e).replace(/'/g, "&apos;")})'>
+      <div class="flex items-start justify-between gap-3 mb-2">
+        <span class="badge-${e.method.toLowerCase()} px-2 py-0.5 rounded text-xs font-mono font-bold">${e.method}</span>
+        <span class="text-[10px] text-gray-500 uppercase tracking-wider">${e.cat}</span>
+      </div>
+      <h3 class="font-bold text-white mb-1">${e.title}</h3>
+      <p class="text-xs text-gray-400 mb-3">${e.desc}</p>
+      <code class="text-xs text-cyan-300 mono">${e.path}</code>
+    </div>
+  `).join('');
+  document.getElementById('stat-endpoints').textContent = ENDPOINTS.length + '+';
+}
+renderTabs(); renderList();
+
+// Modal
+function openModal(type) {
+  const modal = document.getElementById('modal');
+  modal.classList.remove('hidden'); modal.classList.add('flex');
+  document.getElementById('modal-title').textContent = 'Daftar API Key';
+  document.getElementById('modal-body').innerHTML = `
+    <p class="text-sm text-gray-400 mb-5">Isi data di bawah untuk dapat API key gratis (100 req/hari).</p>
+    <div class="space-y-3">
+      <input id="reg-username" placeholder="Username" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white" />
+      <input id="reg-email" type="email" placeholder="Email" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white" />
+      <button onclick="doRegister()" class="btn-primary w-full py-3 rounded-xl font-semibold text-white">Buat API Key →</button>
+    </div>
+    <div id="reg-result" class="mt-4"></div>
+  `;
+}
+function closeModal() {
+  const modal = document.getElementById('modal');
+  modal.classList.add('hidden'); modal.classList.remove('flex');
+}
+async function doRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const out = document.getElementById('reg-result');
+  if (!username || !email) { out.innerHTML = '<div class="text-red-400 text-sm">Lengkapi data dulu</div>'; return; }
+  out.innerHTML = '<div class="text-gray-400 text-sm">Memproses...</div>';
+  try {
+    const r = await fetch('/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email })
+    });
+    const d = await r.json();
+    if (!d.status) { out.innerHTML = `<div class="text-red-400 text-sm">${d.error}</div>`; return; }
+    out.innerHTML = `
+      <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
+        <div class="text-emerald-300 text-sm font-semibold mb-2">✓ Berhasil! Simpan API Key kamu:</div>
+        <div class="bg-black/50 rounded-lg p-3 font-mono text-xs text-cyan-300 break-all select-all">${d.result.apikey}</div>
+        <button onclick="navigator.clipboard.writeText('${d.result.apikey}')" class="mt-3 text-xs text-purple-300 hover:text-purple-100">📋 Copy ke clipboard</button>
+      </div>
+    `;
+  } catch (e) { out.innerHTML = `<div class="text-red-400 text-sm">${e.message}</div>`; }
+}
+
+// Try Modal
+let currentEp = null;
+function openTry(ep) {
+  currentEp = ep;
+  const m = document.getElementById('try-modal');
+  m.classList.remove('hidden'); m.classList.add('flex');
+  document.getElementById('try-title').textContent = ep.title;
+  document.getElementById('try-path').textContent = ep.path;
+  document.getElementById('try-desc').textContent = ep.desc;
+  const mb = document.getElementById('try-method');
+  mb.textContent = ep.method;
+  mb.className = `px-2 py-1 rounded text-xs font-mono mr-2 badge-${ep.method.toLowerCase()}`;
+  document.getElementById('try-params').innerHTML = ep.params.map(p => `
+    <div>
+      <label class="text-xs text-gray-400 mb-1 block">${p.label}${p.required ? ' *' : ''}</label>
+      <input data-name="${p.name}" type="${p.type || 'text'}" placeholder="${p.placeholder || ''}" class="w-full px-3 py-2 rounded-lg bg-black/40 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white text-sm" />
+    </div>
+  `).join('');
+  document.getElementById('try-result').textContent = '— Belum ada request —';
+}
+function closeTryModal() {
+  const m = document.getElementById('try-modal');
+  m.classList.add('hidden'); m.classList.remove('flex');
+}
+document.getElementById('try-btn').onclick = async () => {
+  if (!currentEp) return;
+  const inputs = document.querySelectorAll('#try-params input');
+  const params = {};
+  inputs.forEach(i => { if (i.value) params[i.dataset.name] = i.value; });
+  const out = document.getElementById('try-result');
+  out.textContent = 'Loading...';
+  try {
+    let r;
+    if (currentEp.body) {
+      r = await fetch(currentEp.path, {
+        method: currentEp.method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      });
+    } else {
+      const url = currentEp.path + '?' + new URLSearchParams(params);
+      r = await fetch(url);
+    }
+    if (currentEp.image && r.ok) {
+      const blob = await r.blob();
+      const imgUrl = URL.createObjectURL(blob);
+      out.innerHTML = `<img src="${imgUrl}" class="rounded-lg max-w-full" />`;
+      return;
+    }
+    const text = await r.text();
+    try {
+      out.textContent = JSON.stringify(JSON.parse(text), null, 2);
+    } catch { out.textContent = text; }
+  } catch (e) { out.textContent = 'Error: ' + e.message; }
+};
+
+// Close modals on backdrop click
+document.getElementById('modal').onclick = (e) => { if (e.target.id === 'modal') closeModal(); };
+document.getElementById('try-modal').onclick = (e) => { if (e.target.id === 'try-modal') closeTryModal(); };
+</script>
+</body>
+</html>
