@@ -19,7 +19,7 @@ export async function requireApiKey(
     req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ||
     "";
 
-  if (!key) {
+  if (!key || key.trim() === "") {
     return {
       ok: false,
       res: NextResponse.json(
@@ -33,15 +33,33 @@ export async function requireApiKey(
   if (!apiKey) {
     return {
       ok: false,
-      res: NextResponse.json({ status: false, message: "API key tidak valid" }, { status: 403 }),
+      res: NextResponse.json(
+        { status: false, message: "API key tidak valid" },
+        { status: 403 }
+      ),
     };
   }
 
-  if (apiKey.requests >= apiKey.limit) {
+  // Check if daily limit should be reset (reset at midnight)
+  const now = new Date();
+  const lastUsed = apiKey.lastUsedAt ? new Date(apiKey.lastUsedAt) : null;
+  const shouldReset =
+    !lastUsed ||
+    lastUsed.toDateString() !== now.toDateString();
+
+  let requests = apiKey.requests;
+  if (shouldReset) {
+    requests = 0;
+  }
+
+  if (requests >= apiKey.limit) {
     return {
       ok: false,
       res: NextResponse.json(
-        { status: false, message: `Limit harian terlampaui (${apiKey.limit} request)` },
+        {
+          status: false,
+          message: `Limit harian terlampaui (${apiKey.limit} request). Reset pada tengah malam.`,
+        },
         { status: 429 }
       ),
     };
@@ -49,7 +67,10 @@ export async function requireApiKey(
 
   await prisma.apiKey.update({
     where: { id: apiKey.id },
-    data: { requests: { increment: 1 }, lastUsedAt: new Date() },
+    data: {
+      requests: shouldReset ? 1 : { increment: 1 },
+      lastUsedAt: new Date(),
+    },
   });
 
   prisma.usage
@@ -61,7 +82,7 @@ export async function requireApiKey(
     ctx: {
       apiKeyId: apiKey.id,
       userId: apiKey.userId,
-      remaining: apiKey.limit - apiKey.requests - 1,
+      remaining: apiKey.limit - requests - 1,
     },
   };
 }

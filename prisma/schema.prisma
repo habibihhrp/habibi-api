@@ -7,15 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  plan      String   @default("free")
-  createdAt DateTime @default(now())
-  apiKeys   ApiKey[]
-}
+
 
 model ApiKey {
   id         String   @id @default(cuid())
@@ -41,4 +33,149 @@ model Usage {
   createdAt DateTime @default(now())
 
   @@index([apiKeyId, createdAt])
+}
+
+// WhatsApp Bot Models
+model WhatsAppBot {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name            String
+  token           String   @unique
+  webhookUrl      String?
+  webhookToken    String?
+  phoneNumber     String?
+  phoneNumberId   String?
+  businessId      String?
+  status          String   @default("inactive") // inactive, active, paused
+  messageQueueMax Int      @default(1000)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  contacts        WhatsAppContact[]
+  groups          WhatsAppGroup[]
+  messages        WhatsAppMessage[]
+  autoResponses   WhatsAppAutoResponse[]
+  keywords        WhatsAppKeyword[]
+  stats           WhatsAppStats?
+
+  @@index([userId])
+  @@index([token])
+}
+
+model WhatsAppContact {
+  id            String   @id @default(cuid())
+  botId         String
+  bot           WhatsAppBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  phoneNumber   String
+  name          String?
+  tags          String[] @default([])
+  customData    Json?
+  lastMessageAt DateTime?
+  messageCount  Int      @default(0)
+  blocked       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([botId, phoneNumber])
+  @@index([botId])
+  @@index([tags])
+}
+
+model WhatsAppGroup {
+  id              String   @id @default(cuid())
+  botId           String
+  bot             WhatsAppBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  groupId         String
+  name            String
+  description     String?
+  members         Int      @default(0)
+  admins          String[] @default([])
+  participantIds  String[] @default([])
+  isAdmin         Boolean  @default(false)
+  joinedAt        DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([botId, groupId])
+  @@index([botId])
+}
+
+model WhatsAppMessage {
+  id            String   @id @default(cuid())
+  botId         String
+  bot           WhatsAppBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  messageId     String
+  phoneNumber   String
+  groupId       String?
+  type          String   // text, image, video, audio, document, location, contact, sticker
+  content       String
+  caption       String?
+  mediaUrl      String?
+  fromMe        Boolean
+  timestamp     DateTime
+  status        String   @default("received") // received, sent, delivered, read, failed
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+
+  @@index([botId])
+  @@index([phoneNumber])
+  @@index([groupId])
+  @@index([timestamp])
+}
+
+model WhatsAppAutoResponse {
+  id        String   @id @default(cuid())
+  botId     String
+  bot       WhatsAppBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  trigger   String   // exact match
+  response  String
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([botId, trigger])
+  @@index([botId])
+}
+
+model WhatsAppKeyword {
+  id        String   @id @default(cuid())
+  botId     String
+  bot       WhatsAppBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  keyword   String
+  response  String
+  type      String   @default("contains") // exact, startswith, contains, regex
+  enabled   Boolean  @default(true)
+  priority  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([botId])
+  @@index([priority])
+}
+
+model WhatsAppStats {
+  id                    String   @id @default(cuid())
+  botId                 String   @unique
+  bot                   WhatsAppBot @relation(fields: [botId], references: [id], onDelete: Cascade)
+  totalMessages         Int      @default(0)
+  totalContacts         Int      @default(0)
+  totalGroups           Int      @default(0)
+  messagesSentToday     Int      @default(0)
+  messagesReceivedToday Int      @default(0)
+  requestsToday         Int      @default(0)
+  lastResetAt           DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  username        String   @unique
+  password        String
+  plan            String   @default("free")
+  createdAt       DateTime @default(now())
+  apiKeys         ApiKey[]
+  whatsAppBots    WhatsAppBot[]
 }

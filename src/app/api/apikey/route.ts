@@ -7,35 +7,56 @@ export const runtime = "nodejs";
 export async function GET() {
   const s = await getSession();
   if (!s) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  
   const keys = await prisma.apiKey.findMany({
     where: { userId: s.userId },
     orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json({ apiKeys: keys });
+  
+  return NextResponse.json({
+    apiKeys: keys.map(k => ({
+      id: k.id,
+      key: k.key,
+      name: k.name,
+      requests: k.requests,
+      limit: k.limit,
+      lastUsedAt: k.lastUsedAt?.toISOString() || null,
+      createdAt: k.createdAt.toISOString(),
+    })),
+  });
 }
 
 export async function POST(req: NextRequest) {
   const s = await getSession();
   if (!s) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  
   const body = await req.json().catch(() => ({}));
   const name = (body?.name as string)?.slice(0, 64) || "API Key";
 
   const count = await prisma.apiKey.count({ where: { userId: s.userId } });
   if (count >= 10) {
-    return NextResponse.json({ message: "Maksimum 10 API key per akun" }, { status: 400 });
+    return NextResponse.json(
+      { message: "Maksimum 10 API key per akun" },
+      { status: 400 }
+    );
   }
 
   const key = await prisma.apiKey.create({
     data: { userId: s.userId, name, key: generateApiKey() },
   });
-  return NextResponse.json({
-    apiKey: {
-      id: key.id,
-      key: key.key,
-      name: key.name,
-      requests: key.requests,
-      limit: key.limit,
-      createdAt: key.createdAt.toISOString(),
+  
+  return NextResponse.json(
+    {
+      message: "API key created",
+      apiKey: {
+        id: key.id,
+        key: key.key,
+        name: key.name,
+        requests: key.requests,
+        limit: key.limit,
+        createdAt: key.createdAt.toISOString(),
+      },
     },
-  });
+    { status: 201 }
+  );
 }
