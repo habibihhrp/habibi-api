@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+:root {
+  color-scheme: dark;
+}
+
+html, body {
+  background: #0a0a0f;
+  color: #e8e8f0;
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(at 10% 0%, rgba(167, 139, 250, 0.15) 0px, transparent 50%),
+    radial-gradient(at 90% 10%, rgba(244, 114, 182, 0.1) 0px, transparent 50%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-150;
+}
+.btn-primary {
+  @apply btn bg-gradient-to-r from-accent to-accent2 text-white hover:opacity-90 shadow-lg shadow-accent/20;
+}
+.btn-ghost {
+  @apply btn border border-border bg-panel hover:bg-panel2 text-text;
+}
+.btn-danger {
+  @apply btn bg-danger/10 border border-danger/40 text-danger hover:bg-danger/20;
+}
+
+.card {
+  @apply bg-panel/80 backdrop-blur border border-border rounded-xl p-6;
+}
+
+.input {
+  @apply w-full bg-panel2 border border-border rounded-lg px-4 py-2.5 text-text placeholder:text-muted focus:outline-none focus:border-accent transition-colors;
+}
+
+.code-block {
+  @apply bg-bg border border-border rounded-lg p-4 font-mono text-sm overflow-x-auto;
+}
+
+.tag {
+  @apply inline-block px-2 py-0.5 rounded text-xs font-mono font-semibold;
+}
+.tag-get { @apply tag bg-success/15 text-success; }
+.tag-post { @apply tag bg-accent/15 text-accent; }

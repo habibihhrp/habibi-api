@@ -1,6 +1,8 @@
 {
-  "rewrites": [
-    { "source": "/auth/:path*", "destination": "/api" },
-    { "source": "/api/:path*", "destination": "/api" }
-  ]
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/v1/ytmp3/route.ts": { "maxDuration": 60 },
+    "src/app/api/v1/ytmp4/route.ts": { "maxDuration": 60 },
+    "src/app/api/v1/ai/route.ts": { "maxDuration": 60 }
+  }
 }

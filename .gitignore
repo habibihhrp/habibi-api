@@ -1,6 +1,11 @@
-node_modules/
-data/users.json
+node_modules
+.next
+out
+dist
 .env
-.vercel
-.DS_Store
+.env.local
+.env.*.local
 *.log
+.DS_Store
+.vercel
+.turbo
